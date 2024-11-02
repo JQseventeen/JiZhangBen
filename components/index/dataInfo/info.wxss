@@ -1,0 +1,17 @@
+.container .header {
+  position: sticky;
+  top: 10rpx;
+}
+
+.container .no-data {
+  color: #c0c0c0;
+  text-align: center;
+  margin-top: 20rpx;
+}
+
+.container .network-error-btn {
+  width: 100%;
+  margin-top: 20rpx;
+  color: #fff;
+  background: #69c0ff;
+}
