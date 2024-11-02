@@ -9,19 +9,11 @@ Page({
     date: '',
 
     money: '',
-    // 收支记账的账户
-    account: 'wechat',
 
     typeObj: expendType[0],
     expendType,
     incomeType,
     otherType,
-
-    // 子类型名称
-    subname: expendType[0].sub[0],
-    subIndex: 0,
-    // 餐饮食用方式
-    howEat: '略',
 
     // 是否添加备注
     isAddRemark: false,
@@ -44,9 +36,6 @@ Page({
     this.setData({
       type,
       typeObj: obj,
-      subname: obj.sub ? obj.sub[0] : '',
-      subIndex: 0,
-      howEat: obj.how ? obj.how[obj.how.length - 1] : ''
     })
   },
   
@@ -69,32 +58,6 @@ Page({
     const typeObj = e.detail
     this.setData({
       typeObj,
-      subname: typeObj.sub ? typeObj.sub[0] : '',
-      subIndex: 0,
-      howEat: typeObj.how ? typeObj.how[typeObj.how.length - 1] : ''
-    })
-  },
-
-  // 如果该收支类型有子类型，选择子类型
-  chooseSubName (e) {
-    const { index, name } = e.currentTarget.dataset
-    this.setData({
-      subname: name,
-      subIndex: index
-    })
-  },
-
-  // 餐饮类型选择食用方式 
-  chooseHowEat (e) {
-    this.setData({
-      howEat: e.currentTarget.dataset.how 
-    })
-  },
-
-  // 选择入账账户
-  chooseAccount (e) {
-    this.setData({
-      account: e.currentTarget.dataset.account
     })
   },
 
@@ -124,40 +87,25 @@ Page({
       return
     }
     
-    const { type, date, typeObj, subname, howEat, account, remark } = this.data
+    const { type, date, typeObj, account, remark } = this.data
     
     this.setData({
       isAdd: true,
       isDisabled: true
     })
     
-    wx.cloud.callFunction({
-      name: 'add',
-      data: {
-        type,
-        name: typeObj.type,
-        py: typeObj.py,
-        time: Date.parse(date),
-        money,
-        account,
-        remark: remark ? remark : undefined,
-        sub: subname ? subname : undefined,
-        how: howEat ? howEat : undefined
-      }
-    }).then(() => {
+    // 存储到本地
+    this._saveToLocal(type, date, typeObj, subname, howEat, account, remark, money).then(() => {
       this.setData({
         money: '',
         remark: ''
       })
-
-      this._loadStorage(account, type, money)
-
       wx.reLaunch({
         url: '/pages/index/index'
       })
     }).catch(() => {
       wx.showToast({
-        title: '网络可能出错啦',
+        title: '存储失败',
         icon: 'none'
       })
     }).finally(() => {
@@ -168,17 +116,45 @@ Page({
     })
   },
 
+  _saveToLocal (type, date, typeObj, subname, howEat, account, remark, money) {
+    return new Promise((resolve, reject) => {
+      // 获取当前存储的记账记录
+      const records = wx.getStorageSync('records') || [];
+      
+      // 创建新的记账记录
+      const newRecord = {
+        type,
+        date,
+        name: typeObj.type,
+        account,
+        remark,
+        money: parseFloat(money) * 100, // 将金额转换为分为单位
+      };
+      
+      // 将新记录添加到数组中
+      records.push(newRecord);
+      
+      // 存储更新后的记录到本地存储
+      wx.setStorageSync('records', records);
+      
+      // 更新账户余额
+      this._loadStorage(account, type, parseFloat(money) * 100);
+      
+      resolve();
+    });
+  },
+
   _loadStorage (account, type, money) {
-    const accountObj = getAccount()
+    const accountObj = getAccount();
 
     if (type === 0) {
-      accountObj[`${account}`] -= money * 100
-      if (accountObj[`${account}`] < 0) accountObj[`${account}`] = 0
+      accountObj[`${account}`] -= money;
+      if (accountObj[`${account}`] < 0) accountObj[`${account}`] = 0;
     }
-    if (type === 1) accountObj[`${account}`] += money * 100
+    if (type === 1) accountObj[`${account}`] += money;
 
     setAccount({
       ...accountObj
-    })
+    });
   }
 })
