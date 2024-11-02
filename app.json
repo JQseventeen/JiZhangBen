@@ -1,15 +1,42 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/logs/logs"
+    "pages/details/details",
+    "pages/add/add",
+    "pages/setting/setting"
   ],
   "window": {
-    "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
-    "navigationBarBackgroundColor": "#ffffff"
+    "backgroundColor": "#FFFFFF",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "小福记账",
+    "navigationBarTextStyle": "black"
   },
-  "style": "v2",
-  "componentFramework": "glass-easel",
+  "tabBar": {
+    "color": "#5cdbd3",
+    "selectedColor": "#69c0ff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "收支",
+        "iconPath": "images/icon/index.png",
+        "selectedIconPath": "images/icon/index-active.png"
+      },
+      {
+        "pagePath": "pages/details/details",
+        "text": "明细",
+        "iconPath": "images/icon/details.png",
+        "selectedIconPath": "images/icon/details-active.png"
+      }
+    ]
+  },
+  "useExtendedLib": {
+    "weui": true
+  },
+  "usingComponents": {
+    "com-icon": "/components/common/icon/icon",
+    "com-loading": "/components/common/loading/loading"
+  },
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "style": "v2"
 }
