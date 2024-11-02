@@ -17,7 +17,7 @@ Page({
    * changeTime 在 time-picker 第一次加载和改变时间都会触发
    * 所以直接在这个方法中加载数据即可，不需要在 onLoad 生命周期中加载
    */
-  changeTime(e) {
+  changeTime (e) {
     this.setData({
       date: e.detail,
       expend: '',   // 这里设置 expend 和 income 为空用于显示加载动画
